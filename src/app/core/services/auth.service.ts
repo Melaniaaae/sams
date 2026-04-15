@@ -37,33 +37,35 @@ export class AuthService {
         catchError((err) => {
           console.warn('Backend not reachable — using mock login');
 
-         const mockResponse: AuthResponse = {
-  access_token: 'mock-token-123',
-  token_type: 'bearer', // ✅ FIXED
-  user: {
-    id: '1',
-    name: 'John Doe',
-    email: payload.email,
-    registrationNumber: 'CS123',
-    role: payload.email.includes('admin')
-      ? 'coordinator'
-      : 'student'
-  }
-};
+          const mockResponse: AuthResponse = {
+            access_token: 'mock-token-123',
+            token_type: 'bearer',
+            user: {
+              id: '1',
+              name: 'John Doe',
+              email: payload.email,
+              registrationNumber: 'CS123',
+              role: payload.email.includes('admin')
+                ? 'coordinator'
+                : 'student',
+            },
+          };
 
           this.handleAuthSuccess(mockResponse);
-
           return of(mockResponse);
         })
       );
   }
 
-  logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
-  }
+ logout(): void {
+  localStorage.removeItem(this.TOKEN_KEY);
+  localStorage.removeItem(this.USER_KEY);
+
+  this.currentUserSubject.next(null);
+
+  // 🔥 Force full redirect
+  this.router.navigate(['/auth/login']);
+}
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -77,7 +79,12 @@ export class AuthService {
 
     this.currentUserSubject.next(user);
 
-   this.router.navigate(['/dashboard']);
+    // ✅ FIX: role-based routing
+    if (user.role === 'coordinator') {
+      this.router.navigateByUrl('/coordinator-dashboard');
+    } else {
+      this.router.navigateByUrl('/dashboard');
+    }
   }
 
   private loadUserFromStorage(): AuthUser | null {

@@ -1,7 +1,6 @@
 <app-global-spinner />
 
 <div class="shell">
-<router-outlet></router-outlet>
   <!-- ── Sidebar ───────────────────────────────────────────────────── -->
   <aside class="sidebar" [class.open]="isMenuOpen()">
 
@@ -79,12 +78,12 @@
       </div>
     </header>
 
-    <div class="page-content">
-      <router-outlet />
+     <div class="page-content">
+      <router-outlet></router-outlet>
     </div>
   </main>
 
-</div>
+
 
 <!-- ── Logout confirmation dialog ─────────────────────────────────────── -->
 <div class="dialog-overlay" *ngIf="showLogoutDialog()" (click)="cancelLogout()">
@@ -100,8 +99,9 @@
     <h3 class="dialog-title">Sign out?</h3>
     <p class="dialog-sub">You will be returned to the login page.</p>
     <div class="dialog-actions">
-      <button class="dialog-cancel"  (click)="cancelLogout()">Cancel</button>
-      <button class="dialog-confirm" (click)="logout()">Yes, sign out</button>
+    <button class="dialog-confirm" (click)="confirmAndLogout()">
+  Yes, sign out
+</button>
     </div>
   </div>
 </div>

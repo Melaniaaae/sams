@@ -78,16 +78,16 @@ export class ShellComponent {
 
   initials = computed(() => {
     const name = this.currentUser$()?.name ?? '';
-    return name.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase();
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   });
 
   userName = computed(() => this.currentUser$()?.name ?? '');
-  userSub  = computed(() =>
+  userSub = computed(() =>
     this.currentUser$()?.registrationNumber ??
     (this.isCoordinator() ? 'Coordinator' : 'Student')
   );
 
-  // Page title from current route
+  // Page title
   private routeTitle$ = this.router.events.pipe(
     filter((e) => e instanceof NavigationEnd),
     map((e) => {
@@ -102,17 +102,23 @@ export class ShellComponent {
     return this.sanitizer.bypassSecurityTrustHtml(SVG_ICONS[icon] ?? '');
   }
 
-  confirmLogout(): void { this.showLogoutDialog.set(true); }
-  cancelLogout():  void { this.showLogoutDialog.set(false); }
+  confirmLogout(): void {
+    this.showLogoutDialog.set(true);
+  }
 
-  logout() {
-  this.authService.logout();
+  cancelLogout(): void {
+    this.showLogoutDialog.set(false);
+  }
+confirmAndLogout(): void {
+  this.showLogoutDialog.set(false); // close dialog first
+  this.authService.logout();        // then logout
 }
+  // ✅ FIXED logout (ONLY ONE)
   logout(): void {
-  localStorage.clear();
-  this.currentUserSubject.next(null);
-  this.router.navigate(['/auth/login']); // ✅ THIS IS KEY
-}
+    this.authService.logout(); // handles redirect
+  }
 
-  toggleMenu(): void { this.isMenuOpen.update((v) => !v); }
+  toggleMenu(): void {
+    this.isMenuOpen.update(v => !v);
+  }
 }

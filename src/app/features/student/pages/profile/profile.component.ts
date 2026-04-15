@@ -41,20 +41,29 @@ export class ProfileComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    const studentId = this.auth.currentUser?.id ?? '';
+  this.auth.currentUser$
+    .subscribe(user => {
+      if (!user?.id) {
+        console.error('User not ready');
+        return;
+      }
 
-    forkJoin({
-      student:  this.studentService.getStudent(studentId),
-      progress: this.studentService.getPlacementProgress(studentId),
-    }).subscribe({
-      next: ({ student, progress }) => {
-        this.student.set(student);
-        this.progress.set(progress);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false),
+      forkJoin({
+        student: this.studentService.getStudent(user.id),
+        progress: this.studentService.getPlacementProgress(user.id),
+      }).subscribe({
+        next: ({ student, progress }) => {
+          this.student.set(student);
+          this.progress.set(progress);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          this.isLoading.set(false);
+        },
+      });
     });
-  }
+}
 
   initials(name: string): string {
     return name
