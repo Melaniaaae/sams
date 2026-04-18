@@ -10,6 +10,11 @@ export const routes: Routes = [
       import('./features/auth/pages/login/login.component')
         .then(m => m.LoginComponent)
   },
+  {
+    path: 'auth/signup',
+    loadComponent: () =>
+      import('./features/auth/pages/signup/signup.component').then((m) => m.SignupComponent),
+  },
 
   // ── Protected Shell ──────────────────────────────────
   {
